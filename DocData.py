@@ -1,5 +1,6 @@
 from docx import Document
 import docxedit
+from datetime import datetime
 class DocumentData:
     def __init__(self):
         self.name = "Masztur Bálint"
@@ -12,9 +13,9 @@ class DocumentData:
         self.description = "nincs"
         self.addons = "az összes"
         self.diagnosis = "rosz"
-        self.year = "2001"
-        self.month = "09"
-        self.day = "11"
+        self.year = datetime.today().strftime('%Y')
+        self.month = datetime.today().strftime('%m')
+        self.day = datetime.today().strftime('%d')
 
     def UpdateData(self,doc):
 #Iterating trough the document's tables cuz bitch ass docxedit can't replace strings in tables when parsing the whole doc
