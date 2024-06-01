@@ -25,7 +25,6 @@ def SaveDocument():
     documentData.UpdateData(doc)
     doc.save(output_path)
 
-
 #Main window layout definition
 Label(main_window, text='Név').grid(row=0)
 tk_name = Entry(main_window)
