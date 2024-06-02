@@ -3,16 +3,16 @@ import docxedit
 from datetime import datetime
 class DocumentData:
     def __init__(self):
-        self.name = "Masztur Bálint"
-        self.address = "9700 Szombathely Szopok boré utca. 69/B"
-        self.p_number = "0630-911/4200"
-        self.notes = "Anyjádat xxxd"
-        self.callsign = "az ott"
-        self.type_data = "Mekláren"
-        self.modell = "gyors"
-        self.description = "nincs"
-        self.addons = "az összes"
-        self.diagnosis = "rosz"
+        self.name = "Name Template"
+        self.address = "9999 Hupikékfalva, Törp utca 69"
+        self.p_number = "0630-123-4567"
+        self.notes = "Nincs megjegyzés"
+        self.callsign = "Nincs megnevezés"
+        self.type_data = "Nincs típus"
+        self.modell = "Nincs Modell"
+        self.description = "Nincs leírás"
+        self.addons = "Nincsenek tartozékok"
+        self.diagnosis = "Nincs diagnózis"
         self.year = datetime.today().strftime('%Y')
         self.month = datetime.today().strftime('%m')
         self.day = datetime.today().strftime('%d')

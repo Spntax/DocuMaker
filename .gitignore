@@ -1,2 +1,4 @@
-out/
-out/Output_fun.docx
+out/*
+Main.spec
+build/*
+dist/*
