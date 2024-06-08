@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk 
 from docx import Document
 import docxedit
 import DocData
@@ -49,6 +50,11 @@ def SaveDocument():
     doc.save(output_path)
 
 #Main window layout definition
+selected = StringVar()
+dasCOmbobox = ttk.Combobox(main_window,textvariable=selected)
+dasCOmbobox['values']=usersDB.GetName(s)
+dasCOmbobox.grid(row='100',column='100')
+
 Label(main_window, text='Megrendelő Neve:').grid(row=0, column=0)
 tk_name = Entry(main_window)
 tk_name.grid(row=0, column=1)

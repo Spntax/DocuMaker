@@ -20,10 +20,10 @@ class DocumentData:
 
     def UpdateData(self,doc):
 #Iterating trough the document's tables cuz bitch ass docxedit can't replace strings in tables when parsing the whole doc
+        docxedit.replace_string(doc,"{{DOC_ID}}",self.documentID)
         for table in doc.tables:
             for row in table.rows:
                 for cell in row.cells:
-                    docxedit.replace_string(cell,"{{DOC_ID}}",self.documentID)
                     docxedit.replace_string(cell,"{{NAME}}",self.name)
                     docxedit.replace_string(cell,"{{ADDRESS}}",self.address)
                     docxedit.replace_string(cell,"{{P_NUMBER}}",self.p_number)
