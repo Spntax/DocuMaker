@@ -2,3 +2,4 @@ out/*
 Main.spec
 build/*
 dist/*
+*.zip

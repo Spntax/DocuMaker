@@ -4,6 +4,7 @@ import docxedit
 import DocData
 import os
 import subprocess
+import DB
 
 print("hehe haha")
 
@@ -16,6 +17,7 @@ output_path = 'out/Output_fun.docx'
 doc = Document(template_path)
 
 documentData = DocData.DocumentData()
+usersDB = DB.UsersDB()
 # Global variables ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 def ShowDocument():
@@ -26,6 +28,7 @@ def ShowDocument():
 def SaveDocument():
     doc = Document(template_path)
 # Update the Docuemnt class with the data filled in the main window
+    documentData.documentID = usersDB.GetDocumentID()
     documentData.name = tk_name.get()
     documentData.address = tk_address.get()
     documentData.p_number = tk_phone.get()

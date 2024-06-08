@@ -3,6 +3,7 @@ import docxedit
 from datetime import datetime
 class DocumentData:
     def __init__(self):
+        self.documentID = "0"
         self.name = "Name Template"
         self.address = "9999 Hupikékfalva, Törp utca 69"
         self.p_number = "0630-123-4567"
@@ -22,6 +23,7 @@ class DocumentData:
         for table in doc.tables:
             for row in table.rows:
                 for cell in row.cells:
+                    docxedit.replace_string(cell,"{{DOC_ID}}",self.documentID)
                     docxedit.replace_string(cell,"{{NAME}}",self.name)
                     docxedit.replace_string(cell,"{{ADDRESS}}",self.address)
                     docxedit.replace_string(cell,"{{P_NUMBER}}",self.p_number)
