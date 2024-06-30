@@ -6,6 +6,7 @@ import DocData
 import os
 import subprocess
 import DB
+import Table
 
 print("hehe haha")
 
@@ -41,8 +42,6 @@ def SaveDocument():
     documentData.addons = tk_addon.get()
     documentData.diagnosis = tk_diagnosis.get()
 
-
-
 # Update the template Docx file and replace the data
     documentData.UpdateData(doc)
     print(tk_name.get())
@@ -50,10 +49,9 @@ def SaveDocument():
     doc.save(output_path)
 
 #Main window layout definition
-selected = StringVar()
-dasCOmbobox = ttk.Combobox(main_window,textvariable=selected)
-dasCOmbobox['values']=usersDB.GetName(s)
-dasCOmbobox.grid(row='100',column='100')
+#selected = StringVar()
+#dasCOmbobox = ttk.Combobox(main_window,textvariable=selected)
+#dasCOmbobox.grid(row='100',column='100')
 
 Label(main_window, text='Megrendelő Neve:').grid(row=0, column=0)
 tk_name = Entry(main_window)
@@ -88,8 +86,14 @@ Label(main_window, text='Diagnózis').grid(row=5,column=2)
 tk_diagnosis = Entry(main_window)
 tk_diagnosis.grid(row=5,column=3)
 
-Button(main_window, text='Save', width=15, command=SaveDocument).grid(row=20)
-Button(main_window, text='Show', width=15, command=SaveDocument).grid(row=20, column=2)
+Button(main_window, text='Mentés', width=15, command=SaveDocument).grid(row=20,columnspan=4,pady=10)
+
+
+# ----------------------------- Workitem list --------------------------------
+sep = ttk.Separator(main_window, orient="horizontal").grid(row=21, columnspan=999,pady=15,padx=20,sticky="ew")
+list_data = usersDB.SearchByName("")
+mower_table = Table.Table(main_window,list_data)
+
 
 #Main loop start here
 main_window.mainloop()
