@@ -14,8 +14,19 @@ class UsersDB:
         else:
             results = self.cur.execute("SELECT * FROM Users")
             return results.fetchall()
-    def InsertRecord(self,name_,address_,pnumber_):
-        self.cur.execute("INSERT into Users (name,Address,Pnumber) VALUES ('"+name_+"','"+address_+"','"+pnumber_+"');")
+    def GetWorkTable(self,nameToSearch):
+        if(nameToSearch!=""):
+            results = self.cur.execute("SELECT name,address FROM Users where name='"+nameToSearch+"'")
+            return results.fetchall()
+        else:
+            results = self.cur.execute("SELECT name,Address,Callsign,Comment,JobState FROM Users")
+            return results.fetchall()
+#Comment, JobState
+    def InsertRecord(self,tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis):
+        self.cur.execute("""INSERT into Users
+                         (name,Address,Pnumber,Callsign,Comment,JobState,Notes,TypeData,Modell,Description,Addons,Diagnosis) 
+                         VALUES ('"""+tk_name+"""','"""+tk_address+"""','"""+tk_phone+"""','"""+tk_callsign+"""','','','"""+tk_note+"""',
+                         '"""+tk_type+"""','"""+tk_modell+"""','"""+tk_description+"""','"""+tk_addon+"""','"""+tk_diagnosis+"""');""")
         self.db.commit()
     def GetDocumentID(self):
         result = self.cur.execute("SELECT DocuID FROM DocumentID")
