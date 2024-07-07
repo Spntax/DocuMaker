@@ -78,25 +78,13 @@ def UpdateState(ID_,newState_):
 def ExportDocument(userID):
     global windowUpdate
 
-    doc = Document(template_path)
-    
-# Update the Docuemnt class with the data filled in the main window
-    documentData.documentID = usersDB.GetDocumentID()
-    documentData.name = tk_name.get()
-    documentData.address = tk_address.get()
-    documentData.p_number = tk_phone.get()
-    documentData.notes = tk_note.get()
-    documentData.callsign = tk_callsign.get()
-    documentData.type_data = tk_type.get()
-    documentData.modell = tk_modell.get()
-    documentData.description = tk_description.get()
-    documentData.addons = tk_addon.get()
-    documentData.diagnosis = tk_diagnosis.get()
+    doc = Document(template_path)    
+    recordToExport = usersDB.GetByDocumentID(userID)
+    documentID = usersDB.GetDocumentID()
+    documentData.ExtractDataFromDB(recordToExport,documentID)
 
 # Update the template Docx file and replace the data
     documentData.UpdateData(doc)
-    print(tk_name.get())
-    print(documentData.name)
     doc.save(output_path)
 #Menu Functions here -------------------------------------
 

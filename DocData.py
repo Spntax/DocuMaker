@@ -37,3 +37,27 @@ class DocumentData:
                     docxedit.replace_string(cell,"{{YEAR}}",self.year)
                     docxedit.replace_string(cell,"{{MONTH}}",self.month)
                     docxedit.replace_string(cell,"{{DAY}}",self.day)
+    
+    def ExtractDataFromDB(self,dbList,docID):
+        self.documentID = docID
+        tmp = dbList[1]
+        self.name = tmp
+        tmp = dbList[2]
+        self.address = tmp
+        tmp = dbList[3]
+        self.p_number = tmp
+        tmp = dbList[4]
+        self.callsign = tmp
+        tmp = dbList[7]
+        self.notes = tmp
+        tmp = dbList[8]
+        self.type_data = tmp
+        tmp = dbList[9]
+        self.modell = tmp
+        tmp = dbList[10]
+        self.description = tmp
+        tmp = dbList[11]
+        self.addons = tmp
+        tmp = dbList[12]
+        self.diagnosis = tmp
+

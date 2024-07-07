@@ -14,6 +14,9 @@ class UsersDB:
         else:
             results = self.cur.execute("SELECT * FROM Users")
             return results.fetchall()
+    def GetByDocumentID(self,id_):
+            results = self.cur.execute("SELECT * FROM Users where ID='"+str(id_)+"'")
+            return results.fetchone()
     def GetWorkTable(self,nameToSearch):
         if(nameToSearch!=""):
             results = self.cur.execute("SELECT name,address FROM Users where name='"+nameToSearch+"'")
@@ -24,8 +27,10 @@ class UsersDB:
 #Comment, JobState
     def GetDocumentID(self):
         result = self.cur.execute("SELECT DocuID FROM DocumentID")
-   
-        return result.fetchone()[0]
+        currentDocID = result.fetchone()[0]
+        self.cur.execute("UPDATE DocumentID SET DocuID = "+str((currentDocID+1))+" WHERE ID = 1")
+        self.db.commit()
+        return currentDocID
     def GetName(self,name_):
         if(name_!=""):
             results = self.cur.execute("SELECT name FROM Users where name='"+name_+"'")
