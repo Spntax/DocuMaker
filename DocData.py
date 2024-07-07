@@ -1,6 +1,8 @@
 from docx import Document
 import docxedit
 from datetime import datetime
+from spire.doc import *
+from spire.doc.common import *
 class DocumentData:
     def __init__(self):
         self.documentID = "0"
@@ -61,3 +63,14 @@ class DocumentData:
         tmp = dbList[12]
         self.diagnosis = tmp
 
+    def ConvertToPdf(self):
+        # Create a Document object
+        document = Document()
+        # Load a Word DOCX file
+        document.LoadFromFile("bin/Output_fun.docx")
+        # Or load a Word DOC file
+        #document.LoadFromFile("Sample.doc")
+
+        # Save the file to a PDF file
+        document.SaveToFile("bin/WordToPdf.pdf", FileFormat.PDF)
+        document.Close()

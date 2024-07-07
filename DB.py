@@ -33,11 +33,11 @@ class UsersDB:
         return currentDocID
     def GetName(self,name_):
         if(name_!=""):
-            results = self.cur.execute("SELECT name FROM Users where name='"+name_+"'")
-            return results.fetchall()
+            results = self.cur.execute("SELECT name FROM Users WHERE name LIKE '%"+name_+"%'")
+            return results.fetchone()[0]
         else:
             results = self.cur.execute("SELECT name FROM Users")
-            return results.fetchall()
+            return results.fetchone()[0]
     def InsertRecord(self,tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis):
         self.cur.execute("""INSERT into Users
                          (name,Address,Pnumber,Callsign,Comment,JobState,Notes,TypeData,Modell,Description,Addons,Diagnosis) 

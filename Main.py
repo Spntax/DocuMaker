@@ -14,8 +14,8 @@ print("hehe haha")
 # Global variables ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ
 main_window = Tk()
 
-template_path = "Base_document.docx"
-output_path = 'out/Output_fun.docx'
+template_path = "bin/Base_document.docx"
+output_path = 'bin/Output_fun.docx'
 
 doc = Document(template_path)
 
@@ -27,6 +27,8 @@ windowIsAlive = True
 currentUserID = 0
 
 # Global variables ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+def donothing():
+    print("xd")
 
 def WindowKill():
     global windowIsAlive
@@ -86,6 +88,7 @@ def ExportDocument(userID):
 # Update the template Docx file and replace the data
     documentData.UpdateData(doc)
     doc.save(output_path)
+    os.system('start bin/Output_fun.docx')
 #Menu Functions here -------------------------------------
 
 def CreateWorkItemTable(root,list_data):
@@ -111,8 +114,10 @@ def CreateWorkItemTable(root,list_data):
                     m.add_command(label="Állapot 1", command=lambda i_=i:UpdateState(currentUserID,0))
                     m.add_command(label="Állapot 2", command=lambda i_=i:UpdateState(currentUserID,1))
                     m.add_command(label="Állapot 3", command=lambda i_=i:UpdateState(currentUserID,2))
-                    m.add_command(label="Törlés", command=lambda i_=i:UpdateState(currentUserID,3))
+                    m.add_separator()
                     m.add_command(label="Nyomtatás", command=lambda i_=i:ExportDocument(currentUserID))
+                    m.add_separator()
+                    m.add_command(label="Törlés", command=lambda i_=i:UpdateState(currentUserID,3))
                     e = Entry(root, width=20, fg='blue',
                             font=('Arial',11))
                     if(list_data[i][total_columns]==1):
@@ -131,8 +136,33 @@ def CreateWorkItemTable(root,list_data):
 #dasCOmbobox = ttk.Combobox(main_window,textvariable=selected)
 #dasCOmbobox.grid(row='100',column='100')
 def DrawMainWindow():
+    def NameSearch(e):
+        position = tk_name.index(INSERT)
+        print(position)
+        print(e.char)
+        if e.char == "":
+            print("yahooo")
+        else:
+            predictedText = usersDB.GetName(tk_name.get())
+            print(predictedText)
+            tk_name.insert(position,predictedText[position:])
+            tk_name.selection_range(position,END)
+    MenuBar = Menu(main_window)
+    #File tab ----------
+    FileMenu = Menu(MenuBar, tearoff=0)
+    MenuBar.add_cascade(label="File", menu = FileMenu)
+    FileMenu.add_command(label="Word Dokumentum Szerkesztése", command=None)
+    FileMenu.add_command(label="Adatbázis mentése", command=None)
+    FileMenu.add_command(label="Adatbázis betöltése", command=None)
+    #Info tab--------------
+    InfoMenu = Menu(MenuBar, tearoff=0)
+    MenuBar.add_cascade(label="Info", menu = InfoMenu)
+    InfoMenu.add_command(label="Útmutató", command=None)
+    InfoMenu.add_command(label="Kontakt", command=None)
     Label(main_window, text='Megrendelő Neve:').grid(row=0, column=0)
-    tk_name = Entry(main_window).grid(row=0, column=1)
+    tk_name = Entry(main_window)
+    tk_name.grid(row=0, column=1)
+    tk_name.bind("<KeyRelease>",NameSearch)
     Label(main_window, text='Cím').grid(row=1)
     tk_address = Entry(main_window).grid(row=1,column=1)
     Label(main_window, text='Telefon').grid(row=2)
@@ -156,7 +186,6 @@ def DrawMainWindow():
 
     Button(main_window, text='Mentés', width=15, command=lambda: SaveDocument(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis)).grid(row=19,columnspan=4,pady=10)
 
-
     # ----------------------------- Workitem list --------------------------------
     sep = ttk.Separator(main_window, orient="horizontal").grid(row=21, columnspan=999,pady=15,padx=20,sticky="ew")
     Label(main_window,text="Név").grid(row=22,column=0)
@@ -165,10 +194,15 @@ def DrawMainWindow():
     Label(main_window,text="Eszköz").grid(row=22,column=3)
     Label(main_window,text="Komment").grid(row=22,column=4)
 
+    main_window.config(menu=MenuBar)
+
     CreateWorkItemTable(main_window,list_data)
 
-DrawMainWindow()
+    main_window.title("DocuMaker")
+    icon = PhotoImage(file="bin/icon.png")
+    main_window.iconphoto(icon,icon)
 
+DrawMainWindow()
 main_window.protocol("WM_DELETE_WINDOW",  WindowKill)
 
 windowIsAlive = True
