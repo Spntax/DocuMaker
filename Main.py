@@ -27,20 +27,12 @@ windowIsAlive = True
 currentUserID = 0
 
 # Global variables ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-def donothing():
-    print("xd")
-
 def WindowKill():
     global windowIsAlive
     windowIsAlive = False
     print("Crush kill destroy SWAG")
 
-def ShowDocument():
-    SaveDocument()
-    subprocess.Popen([output_path],shell=True)
-    os.startfile(output_path)
-
-def SaveDocument(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis):
+def SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis):
     global windowUpdate
     doc = Document(template_path)
 # Update the Docuemnt class with the data filled in the main window
@@ -77,7 +69,7 @@ def UpdateState(ID_,newState_):
     usersDB.UpdateState(ID_,newState_)
     windowUpdate=True
 
-def ExportDocument(userID):
+def PrintDocument(userID):
     global windowUpdate
 
     doc = Document(template_path)    
@@ -115,7 +107,7 @@ def CreateWorkItemTable(root,list_data):
                     m.add_command(label="Állapot 2", command=lambda i_=i:UpdateState(currentUserID,1))
                     m.add_command(label="Állapot 3", command=lambda i_=i:UpdateState(currentUserID,2))
                     m.add_separator()
-                    m.add_command(label="Nyomtatás", command=lambda i_=i:ExportDocument(currentUserID))
+                    m.add_command(label="Nyomtatás", command=lambda i_=i:PrintDocument(currentUserID))
                     m.add_separator()
                     m.add_command(label="Törlés", command=lambda i_=i:UpdateState(currentUserID,3))
                     e = Entry(root, width=20, fg='blue',
@@ -164,27 +156,36 @@ def DrawMainWindow():
     tk_name.grid(row=0, column=1)
     tk_name.bind("<KeyRelease>",NameSearch)
     Label(main_window, text='Cím').grid(row=1)
-    tk_address = Entry(main_window).grid(row=1,column=1)
+    tk_address = Entry(main_window)
+    tk_address.grid(row=1,column=1)
     Label(main_window, text='Telefon').grid(row=2)
-    tk_phone = Entry(main_window).grid(row=2,column=1)
+    tk_phone = Entry(main_window)
+    tk_phone.grid(row=2,column=1)
     Label(main_window, text='Megjegyzés').grid(row=3)
-    tk_note = Entry(main_window).grid(row=3,column=1)
+    tk_note = Entry(main_window)
+    tk_note.grid(row=3,column=1)
     Label(main_window, text='Megnevezés').grid(row=0,column=2)
-    tk_callsign = Entry(main_window).grid(row=0,column=3)
+    tk_callsign = Entry(main_window)
+    tk_callsign.grid(row=0,column=3)
     Label(main_window, text='Típus').grid(row=1,column=2)
-    tk_type = Entry(main_window).grid(row=1,column=3)
+    tk_type = Entry(main_window)
+    tk_type.grid(row=1,column=3)
     Label(main_window, text='Modell').grid(row=2,column=2)
-    tk_modell = Entry(main_window).grid(row=2,column=3)
+    tk_modell = Entry(main_window)
+    tk_modell.grid(row=2,column=3)
     # Blank line filler
     Label(main_window, text='').grid(row=4,column=0)
     Label(main_window, text='Hibajelenség').grid(row=5,column=0)
-    tk_description = Entry(main_window).grid(row=5,column=1)
+    tk_description = Entry(main_window)
+    tk_description.grid(row=5,column=1)
     Label(main_window, text='Tartozékok').grid(row=6,column=0)
-    tk_addon = Entry(main_window).grid(row=6,column=1)
+    tk_addon = Entry(main_window)
+    tk_addon.grid(row=6,column=1)
     Label(main_window, text='Diagnózis').grid(row=5,column=2)
-    tk_diagnosis = Entry(main_window).grid(row=5,column=3)
+    tk_diagnosis = Entry(main_window)
+    tk_diagnosis.grid(row=5,column=3)
 
-    Button(main_window, text='Mentés', width=15, command=lambda: SaveDocument(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis)).grid(row=19,columnspan=4,pady=10)
+    Button(main_window, text='Mentés', width=15, command=lambda: SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis)).grid(row=19,columnspan=4,pady=10)
 
     # ----------------------------- Workitem list --------------------------------
     sep = ttk.Separator(main_window, orient="horizontal").grid(row=21, columnspan=999,pady=15,padx=20,sticky="ew")
