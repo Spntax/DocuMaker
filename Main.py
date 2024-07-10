@@ -63,7 +63,7 @@ def SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_mode
     windowUpdate = True
     print(windowUpdate)
     
-#Menu Functions here -------------------------------------
+# Menu Functions here -------------------------------------
 def UpdateState(ID_,newState_):
     global windowUpdate
     usersDB.UpdateState(ID_,newState_)
@@ -73,7 +73,7 @@ def PrintDocument(userID):
     global windowUpdate
 
     doc = Document(template_path)    
-    recordToExport = usersDB.GetByDocumentID(userID)
+    recordToExport = usersDB.GetByUserID(userID)
     documentID = usersDB.GetDocumentID()
     documentData.ExtractDataFromDB(recordToExport,documentID)
 
@@ -81,7 +81,10 @@ def PrintDocument(userID):
     documentData.UpdateData(doc)
     doc.save(output_path)
     os.system('start bin/Output_fun.docx')
-#Menu Functions here -------------------------------------
+
+def OpenTemplateDoc():
+    os.system('start bin/Base_document.docx')
+# Menu Functions here -------------------------------------
 
 def CreateWorkItemTable(root,list_data):
     def do_popup(event,userID): 
@@ -122,11 +125,6 @@ def CreateWorkItemTable(root,list_data):
                     e.configure(state=DISABLED)
                     e.bind("<Button-3>",lambda event, user_id=list_data[i][0]: do_popup(event, user_id))
 
-
-#Main window layout definition
-#selected = StringVar()
-#dasCOmbobox = ttk.Combobox(main_window,textvariable=selected)
-#dasCOmbobox.grid(row='100',column='100')
 def DrawMainWindow():
     def NameSearch(e):
         position = tk_name.index(INSERT)
@@ -139,11 +137,43 @@ def DrawMainWindow():
             print(predictedText)
             tk_name.insert(position,predictedText[position:])
             tk_name.selection_range(position,END)
+    def NameSelectedFromList(ID_,nameSelectWindow):
+        end = ID_.index(",")
+        choosenUserData = usersDB.GetByUserID(ID_[1:end])
+        tk_name.delete(0,END)
+        tk_address.delete(0,END)
+        tk_phone.delete(0,END)
+        tk_name.insert(0,choosenUserData[1])
+        tk_address.insert(0,choosenUserData[2])
+        tk_phone.insert(0,choosenUserData[3])
+        nameSelectWindow.destroy()
+    def NameSelected(e):
+        name = tk_name.get()
+        records = usersDB.SearchByName(name.title())
+        print(len(records))
+        if len(records) <= 1:
+            tk_name.delete(0,END)
+            tk_address.delete(0,END)
+            tk_phone.delete(0,END)
+            tk_name.insert(0,records[0][1])
+            tk_address.insert(0,records[0][2])
+            tk_phone.insert(0,records[0][3])
+        else:
+            nameSelectWindow = Tk()
+            Label(nameSelectWindow, text="Több azonos nevű személy van elmentve az adatbázisban \n Válassz a listából").pack(padx=10, pady=(10,0))
+            tk_listbox = Listbox(nameSelectWindow,width=100,height=5)
+            tk_listbox.pack(padx=10,pady=20)
+            tk_okButton = Button(nameSelectWindow, text = "Ok", width=20, command= lambda: NameSelectedFromList(tk_listbox.get(ACTIVE),nameSelectWindow))
+            tk_okButton.pack(padx=10, pady=10)
+            for record in records:
+                fullText = "#"+str(record[0])+", "+str(record[1])+", "+str(record[2])+", "+str(record[3])
+                tk_listbox.insert(END,fullText)
+
     MenuBar = Menu(main_window)
     #File tab ----------
     FileMenu = Menu(MenuBar, tearoff=0)
     MenuBar.add_cascade(label="File", menu = FileMenu)
-    FileMenu.add_command(label="Word Dokumentum Szerkesztése", command=None)
+    FileMenu.add_command(label="Word Dokumentum Szerkesztése", command=OpenTemplateDoc)
     FileMenu.add_command(label="Adatbázis mentése", command=None)
     FileMenu.add_command(label="Adatbázis betöltése", command=None)
     #Info tab--------------
@@ -155,6 +185,7 @@ def DrawMainWindow():
     tk_name = Entry(main_window)
     tk_name.grid(row=0, column=1)
     tk_name.bind("<KeyRelease>",NameSearch)
+    tk_name.bind("<Return>",NameSelected)
     Label(main_window, text='Cím').grid(row=1)
     tk_address = Entry(main_window)
     tk_address.grid(row=1,column=1)
@@ -207,9 +238,8 @@ DrawMainWindow()
 main_window.protocol("WM_DELETE_WINDOW",  WindowKill)
 
 windowIsAlive = True
-#Main loop start here
 
-#main_window.mainloop()
+# Main loop start here
 while windowIsAlive:
     main_window.update()
     main_window.update_idletasks()

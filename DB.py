@@ -14,7 +14,7 @@ class UsersDB:
         else:
             results = self.cur.execute("SELECT * FROM Users")
             return results.fetchall()
-    def GetByDocumentID(self,id_):
+    def GetByUserID(self,id_):
             results = self.cur.execute("SELECT * FROM Users where ID='"+str(id_)+"'")
             return results.fetchone()
     def GetWorkTable(self,nameToSearch):
