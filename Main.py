@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import ttk 
+from tkinter import filedialog
 from docx import Document
-import docxedit
+import shutil
 import DocData
 import os
 import subprocess
@@ -84,6 +85,32 @@ def PrintDocument(userID):
 
 def OpenTemplateDoc():
     os.system('start bin/Base_document.docx')
+
+def SaveDB():
+    filename = filedialog.asksaveasfilename(initialdir = "/", title = "Select a File", filetypes = (("Sqlite DB","*.db*"), ("all files","*.*")))
+    shutil.copyfile("bin/users_db.db",filename+".db")
+
+def ImportDB():
+    global windowUpdate
+    filename = filedialog.askopenfilename(initialdir = "/", title = "Select a File", filetypes = (("Sqlite DB","*.db*"), ("all files","*.*")))
+    shutil.copyfile("bin/users_db.db","bin/users_db_old.db")
+    shutil.copyfile(filename,"bin/users_db.db")
+    windowUpdate = True
+
+def SetDocID():
+    def updateDocID(newID):
+        usersDB.UpdateDocID(newID)
+        tk_curID.config(text=newID)
+        tk_DocID.delete(0,END)
+    docIDUpdateWindow = Tk()
+    docIDUpdateWindow.title("Dokument Sorszám")
+    tk_curID = Label(docIDUpdateWindow, text=""+str(usersDB.GetDocumentID())+"", font=('Arial',16,'bold'))
+    tk_curID.pack(padx=10, pady=(10,0))
+    Label(docIDUpdateWindow, text="Adj meg új dokument sorszámot:").pack(padx=10, pady=(25,0))
+    tk_DocID = Entry(docIDUpdateWindow)
+    tk_DocID.pack(padx=10)
+    Button(docIDUpdateWindow, text="OK", width=10, command=lambda: updateDocID(tk_DocID.get())).pack(padx=100,pady=10)
+
 # Menu Functions here -------------------------------------
 
 def CreateWorkItemTable(root,list_data):
@@ -102,7 +129,7 @@ def CreateWorkItemTable(root,list_data):
     for j in range(total_columns):
         if j!= 0:
             for i in range(total_rows):
-                #Check if item is not "removed"
+                # Check if item is not "removed"
                 if(list_data[i][total_columns]!=3):
                     m = Menu(root, tearoff=0)
                     #m.add_command(label="Komment")
@@ -174,8 +201,9 @@ def DrawMainWindow():
     FileMenu = Menu(MenuBar, tearoff=0)
     MenuBar.add_cascade(label="File", menu = FileMenu)
     FileMenu.add_command(label="Word Dokumentum Szerkesztése", command=OpenTemplateDoc)
-    FileMenu.add_command(label="Adatbázis mentése", command=None)
-    FileMenu.add_command(label="Adatbázis betöltése", command=None)
+    FileMenu.add_command(label="Adatbázis mentése", command=SaveDB)
+    FileMenu.add_command(label="Adatbázis betöltése", command=ImportDB)
+    FileMenu.add_command(label="Dokumentum sorszám", command=SetDocID)
     #Info tab--------------
     InfoMenu = Menu(MenuBar, tearoff=0)
     MenuBar.add_cascade(label="Info", menu = InfoMenu)
@@ -195,15 +223,15 @@ def DrawMainWindow():
     Label(main_window, text='Megjegyzés').grid(row=3)
     tk_note = Entry(main_window)
     tk_note.grid(row=3,column=1)
-    Label(main_window, text='Megnevezés').grid(row=0,column=2)
+    Label(main_window, text='Megnevezés').grid(row=0,column=3)
     tk_callsign = Entry(main_window)
-    tk_callsign.grid(row=0,column=3)
-    Label(main_window, text='Típus').grid(row=1,column=2)
+    tk_callsign.grid(row=0,column=4)
+    Label(main_window, text='Típus').grid(row=1,column=3)
     tk_type = Entry(main_window)
-    tk_type.grid(row=1,column=3)
-    Label(main_window, text='Modell').grid(row=2,column=2)
+    tk_type.grid(row=1,column=4)
+    Label(main_window, text='Modell').grid(row=2,column=3)
     tk_modell = Entry(main_window)
-    tk_modell.grid(row=2,column=3)
+    tk_modell.grid(row=2,column=4)
     # Blank line filler
     Label(main_window, text='').grid(row=4,column=0)
     Label(main_window, text='Hibajelenség').grid(row=5,column=0)
@@ -212,11 +240,11 @@ def DrawMainWindow():
     Label(main_window, text='Tartozékok').grid(row=6,column=0)
     tk_addon = Entry(main_window)
     tk_addon.grid(row=6,column=1)
-    Label(main_window, text='Diagnózis').grid(row=5,column=2)
+    Label(main_window, text='Diagnózis').grid(row=5,column=3)
     tk_diagnosis = Entry(main_window)
-    tk_diagnosis.grid(row=5,column=3)
+    tk_diagnosis.grid(row=5,column=4)
 
-    Button(main_window, text='Mentés', width=15, command=lambda: SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis)).grid(row=19,columnspan=4,pady=10)
+    Button(main_window, text='Mentés', width=15, command=lambda: SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis)).grid(row=19,columnspan=5,pady=10)
 
     # ----------------------------- Workitem list --------------------------------
     sep = ttk.Separator(main_window, orient="horizontal").grid(row=21, columnspan=999,pady=15,padx=20,sticky="ew")

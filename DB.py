@@ -49,5 +49,10 @@ class UsersDB:
         self.cur.execute("UPDATE Users SET JobState = "+str(newState_)+" WHERE ID = "+str(ID_)+"")
         self.db.commit()
 
+    def UpdateDocID(self,newID_):
+        #newState = str(newState_)
+        self.cur.execute("UPDATE DocumentID SET DocuID = "+str(newID_)+" WHERE ID = 1")
+        self.db.commit()
+
 #thing = UsersDB()
 #thing.InsertRecord("Másik Nber","Hajléktalan","06308775959")

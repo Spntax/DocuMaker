@@ -3,3 +3,8 @@ Main.spec
 build/*
 dist/*
 *.zip
+bin/users_db.db
+bin/users_db_old.db
+bin/users_db - Copy.db
+xdxdxd.db
+hehhe
