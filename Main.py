@@ -70,6 +70,24 @@ def UpdateState(ID_,newState_):
     usersDB.UpdateState(ID_,newState_)
     windowUpdate=True
 
+def UpdateComment(ID_):
+    def CommitCommentUpdate(newComment):
+        global windowUpdate
+        usersDB.UpdateComment(ID_,newComment)
+        windowUpdate=True
+        commentUpdateWindow.destroy()
+    currentComment = usersDB.GetComment(ID_)
+    commentUpdateWindow = Tk()
+    commentUpdateWindow.eval('tk::PlaceWindow . center')
+    commentUpdateWindow.title("Komment")
+    #tk_curID = Label(commentUpdateWindow, text="Komment", font=('Arial',11,'bold'))
+    #tk_curID.pack(padx=10, pady=(10,0))
+    #Label(commentUpdateWindow, text="Adj meg új dokument sorszámot:").pack(padx=10, pady=(25,0))
+    tk_Comment = Entry(commentUpdateWindow,width=40)
+    tk_Comment.pack(padx=10)
+    tk_Comment.insert(0,currentComment)
+    Button(commentUpdateWindow, text="OK", width=10, command=lambda: CommitCommentUpdate(tk_Comment.get())).pack(padx=100,pady=10)
+
 def PrintDocument(userID):
     global windowUpdate
 
@@ -103,6 +121,7 @@ def SetDocID():
         tk_curID.config(text=newID)
         tk_DocID.delete(0,END)
     docIDUpdateWindow = Tk()
+    docIDUpdateWindow.eval('tk::PlaceWindow . center')
     docIDUpdateWindow.title("Dokument Sorszám")
     tk_curID = Label(docIDUpdateWindow, text=""+str(usersDB.GetDocumentID(False))+"", font=('Arial',16,'bold'))
     tk_curID.pack(padx=10, pady=(10,0))
@@ -138,6 +157,8 @@ def CreateWorkItemTable(root,list_data):
                     m.add_command(label="Állapot 3", command=lambda i_=i:UpdateState(currentUserID,2))
                     m.add_separator()
                     m.add_command(label="Nyomtatás", command=lambda i_=i:PrintDocument(currentUserID))
+                    m.add_separator()
+                    m.add_command(label="Komment", command=lambda i_=i:UpdateComment(currentUserID))
                     m.add_separator()
                     m.add_command(label="Törlés", command=lambda i_=i:UpdateState(currentUserID,3))
                     e = Entry(root, width=20, fg='blue',
@@ -259,6 +280,7 @@ def DrawMainWindow():
     CreateWorkItemTable(main_window,list_data)
 
     main_window.title("DocuMaker")
+    main_window.eval('tk::PlaceWindow . center')
     icon = PhotoImage(file="bin/icon.png")
     main_window.iconphoto(icon,icon)
 
