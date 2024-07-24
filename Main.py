@@ -37,7 +37,7 @@ def SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_mode
     global windowUpdate
     doc = Document(template_path)
 # Update the Docuemnt class with the data filled in the main window
-    documentData.documentID = usersDB.GetDocumentID()
+    documentData.documentID = usersDB.GetDocumentID(True)
     documentData.name = tk_name.get()
     documentData.address = tk_address.get()
     documentData.p_number = tk_phone.get()
@@ -75,7 +75,7 @@ def PrintDocument(userID):
 
     doc = Document(template_path)    
     recordToExport = usersDB.GetByUserID(userID)
-    documentID = usersDB.GetDocumentID()
+    documentID = usersDB.GetDocumentID(True)
     documentData.ExtractDataFromDB(recordToExport,documentID)
 
 # Update the template Docx file and replace the data
@@ -104,7 +104,7 @@ def SetDocID():
         tk_DocID.delete(0,END)
     docIDUpdateWindow = Tk()
     docIDUpdateWindow.title("Dokument Sorszám")
-    tk_curID = Label(docIDUpdateWindow, text=""+str(usersDB.GetDocumentID())+"", font=('Arial',16,'bold'))
+    tk_curID = Label(docIDUpdateWindow, text=""+str(usersDB.GetDocumentID(False))+"", font=('Arial',16,'bold'))
     tk_curID.pack(padx=10, pady=(10,0))
     Label(docIDUpdateWindow, text="Adj meg új dokument sorszámot:").pack(padx=10, pady=(25,0))
     tk_DocID = Entry(docIDUpdateWindow)

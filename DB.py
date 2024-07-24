@@ -25,11 +25,12 @@ class UsersDB:
             results = self.cur.execute("SELECT ID,name,Address,Pnumber,Callsign,Comment,JobState FROM Users")
             return results.fetchall()
 #Comment, JobState
-    def GetDocumentID(self):
+    def GetDocumentID(self,docCounter):
         result = self.cur.execute("SELECT DocuID FROM DocumentID")
         currentDocID = result.fetchone()[0]
-        self.cur.execute("UPDATE DocumentID SET DocuID = "+str((currentDocID+1))+" WHERE ID = 1")
-        self.db.commit()
+        if docCounter:
+            self.cur.execute("UPDATE DocumentID SET DocuID = "+str((currentDocID+1))+" WHERE ID = 1")
+            self.db.commit()
         return currentDocID
     def GetName(self,name_):
         if(name_!=""):
