@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk 
 from tkinter import filedialog
+from tkinter import messagebox
 from docx import Document
 import shutil
 import DocData
@@ -70,6 +71,20 @@ def UpdateState(ID_,newState_):
     usersDB.UpdateState(ID_,newState_)
     windowUpdate=True
 
+def DeleteWorkItem(ID_,newState_):
+    def YesClicked(ID_,newState_):
+        global windowUpdate
+        usersDB.UpdateState(ID_,newState_)
+        delete_popup.destroy()
+        windowUpdate=True
+    delete_popup=Tk()
+    delete_popup.title("Figyelmeztetés")
+    delete_popup.eval('tk::PlaceWindow . center')
+    Label(delete_popup,text="Biztos hogy törölni szeretnéd ezt a bejegyzést?",font=('Arial',11,'bold')).grid(row=0,column=0,columnspan=2, padx=10,pady=20)
+    Button(delete_popup, text="Igen", width=10, command=lambda: YesClicked(ID_,newState_)).grid(row=1,column=0,padx=(70,20),pady=20)
+    Button(delete_popup, text='Nem', width=10, command = lambda: delete_popup.destroy()).grid(row=1,column=1,padx=(20,70),pady=20)
+
+
 def UpdateComment(ID_):
     def CommitCommentUpdate(newComment):
         global windowUpdate
@@ -115,6 +130,19 @@ def ImportDB():
     shutil.copyfile(filename,"bin/users_db.db")
     windowUpdate = True
 
+def DeleteDB():
+    msg_box = messagebox.askquestion(
+        "Adatbázis Törlése",
+        "Biztos hogy törölni akarod az adatbázist? \n\nEgy biztonsági mentés fog készülni a jelenlegi adatbázisról.",
+        icon="warning",
+    )
+    if msg_box =="yes":
+        global windowUpdate
+        shutil.copyfile("bin/users_db.db","bin/users_db_deleted.db")
+        shutil.copyfile("bin/users_db_empty.db","bin/users_db.db")
+        windowUpdate = True
+    
+
 def SetDocID():
     def updateDocID(newID):
         usersDB.UpdateDocID(newID)
@@ -140,38 +168,38 @@ def CreateWorkItemTable(root,list_data):
             currentUserID = userID
         finally: 
             m.grab_release() 
+    if len(list_data)>0:
+        total_rows = len(list_data)
+        total_columns = len(list_data[0])
+        total_columns = total_columns-1
+        # code for creating table
+        for j in range(total_columns):
+            if j!= 0:
+                for i in range(total_rows):
+                    # Check if item is not "removed"
+                    if(list_data[i][total_columns]!=3):
+                        m = Menu(root, tearoff=0)
+                        #m.add_command(label="Komment")
+                        m.add_command(label="Állapot 1", command=lambda i_=i:UpdateState(currentUserID,0))
+                        m.add_command(label="Állapot 2", command=lambda i_=i:UpdateState(currentUserID,1))
+                        m.add_command(label="Állapot 3", command=lambda i_=i:UpdateState(currentUserID,2))
+                        m.add_separator()
+                        m.add_command(label="Nyomtatás", command=lambda i_=i:PrintDocument(currentUserID))
+                        m.add_separator()
+                        m.add_command(label="Komment", command=lambda i_=i:UpdateComment(currentUserID))
+                        m.add_separator()
+                        m.add_command(label="Törlés", command=lambda i_=i:DeleteWorkItem(currentUserID,3))
+                        e = Entry(root, width=20, fg='blue',
+                                font=('Arial',11))
+                        if(list_data[i][total_columns]==1):
+                            e.configure({"disabledbackground": "yellow"})
+                        if(list_data[i][total_columns]==2):
+                            e.configure({"disabledbackground": "lawngreen"})
 
-    total_rows = len(list_data)
-    total_columns = len(list_data[0])
-    total_columns = total_columns-1
-    # code for creating table
-    for j in range(total_columns):
-        if j!= 0:
-            for i in range(total_rows):
-                # Check if item is not "removed"
-                if(list_data[i][total_columns]!=3):
-                    m = Menu(root, tearoff=0)
-                    #m.add_command(label="Komment")
-                    m.add_command(label="Állapot 1", command=lambda i_=i:UpdateState(currentUserID,0))
-                    m.add_command(label="Állapot 2", command=lambda i_=i:UpdateState(currentUserID,1))
-                    m.add_command(label="Állapot 3", command=lambda i_=i:UpdateState(currentUserID,2))
-                    m.add_separator()
-                    m.add_command(label="Nyomtatás", command=lambda i_=i:PrintDocument(currentUserID))
-                    m.add_separator()
-                    m.add_command(label="Komment", command=lambda i_=i:UpdateComment(currentUserID))
-                    m.add_separator()
-                    m.add_command(label="Törlés", command=lambda i_=i:UpdateState(currentUserID,3))
-                    e = Entry(root, width=20, fg='blue',
-                            font=('Arial',11))
-                    if(list_data[i][total_columns]==1):
-                        e.configure({"disabledbackground": "yellow"})
-                    if(list_data[i][total_columns]==2):
-                        e.configure({"disabledbackground": "lawngreen"})
-
-                    e.grid(row=i+23, column=j-1)
-                    e.insert(END, list_data[i][j])
-                    e.configure(state=DISABLED)
-                    e.bind("<Button-3>",lambda event, user_id=list_data[i][0]: do_popup(event, user_id))
+                        e.grid(row=i+23, column=j-1)
+                        e.insert(END, list_data[i][j])
+                        e.configure(state=DISABLED)
+                        e.bind("<Button-3>",lambda event, user_id=list_data[i][0]: do_popup(event, user_id))
 
 def DrawMainWindow():
     def NameSearch(e):
@@ -221,15 +249,17 @@ def DrawMainWindow():
     #File tab ----------
     FileMenu = Menu(MenuBar, tearoff=0)
     MenuBar.add_cascade(label="File", menu = FileMenu)
-    FileMenu.add_command(label="Word Dokumentum Szerkesztése", command=OpenTemplateDoc)
-    FileMenu.add_command(label="Adatbázis mentése", command=SaveDB)
-    FileMenu.add_command(label="Adatbázis betöltése", command=ImportDB)
+    FileMenu.add_command(label="Minta Dokumentum Szerkesztése", command=OpenTemplateDoc)
+    FileMenu
+    FileMenu
     FileMenu.add_command(label="Dokumentum sorszám", command=SetDocID)
     #Info tab--------------
     InfoMenu = Menu(MenuBar, tearoff=0)
-    MenuBar.add_cascade(label="Info", menu = InfoMenu)
-    InfoMenu.add_command(label="Útmutató", command=None)
-    InfoMenu.add_command(label="Kontakt", command=None)
+    MenuBar.add_cascade(label="Adatbázis", menu = InfoMenu)
+    InfoMenu.add_command(label="Adatbázis Mentése", command=SaveDB)
+    InfoMenu.add_command(label="Adatbázis Betöltése", command=ImportDB)
+    InfoMenu.add_separator()
+    InfoMenu.add_command(label="Adatbázis Törlése", command=DeleteDB)
     Label(main_window, text='Megrendelő Neve:').grid(row=0, column=0,sticky="e")
     tk_name = Entry(main_window)
     tk_name.grid(row=0, column=1, columnspan=2, sticky="EW", padx=(20,80))
@@ -244,31 +274,32 @@ def DrawMainWindow():
     Label(main_window, text='Megjegyzés').grid(row=3,sticky="e")
     tk_note = Entry(main_window)
     tk_note.grid(row=3,column=1)
-    Label(main_window, text='Megnevezés').grid(row=0,column=3,sticky="e")
+    Label(main_window, text='Megnevezés').grid(row=0,column=2,columnspan=2,sticky="e",padx=(40,45))
     tk_callsign = Entry(main_window)
-    tk_callsign.grid(row=0,column=4,sticky="EW")
-    Label(main_window, text='Típus').grid(row=1,column=3,sticky="e")
+    tk_callsign.grid(row=0,column=3,columnspan=2, sticky="EW", padx=(130,20))
+    Label(main_window, text='Típus').grid(row=1,column=2,columnspan=2,sticky="e",padx=(40,45))
     tk_type = Entry(main_window)
-    tk_type.grid(row=1,column=4,sticky="EW")
-    Label(main_window, text='Modell').grid(row=2,column=3,sticky="e")
+    tk_type.grid(row=1,column=3,columnspan=2, sticky="EW", padx=(130,20))
+    Label(main_window, text='Modell').grid(row=2,column=2,columnspan=2,sticky="e",padx=(40,45))
     tk_modell = Entry(main_window)
-    tk_modell.grid(row=2,column=4,sticky="EW")
+    tk_modell.grid(row=2,column=3,columnspan=2, sticky="EW", padx=(130,20))
     # Blank line filler
     Label(main_window, text='').grid(row=4,column=0)
     Label(main_window, text='Hibajelenség').grid(row=5,column=0,sticky="e")
     tk_description = Entry(main_window)
-    tk_description.grid(row=5,column=1,sticky="EW")
+    tk_description.grid(row=5,column=1, columnspan=2 ,sticky="EW",padx=(20,100))
     Label(main_window, text='Tartozékok').grid(row=6,column=0,sticky="e")
     tk_addon = Entry(main_window)
-    tk_addon.grid(row=6,column=1,sticky="EW")
-    Label(main_window, text='Diagnózis',).grid(row=5,column=2,sticky="e")
+    tk_addon.grid(row=6,column=1,columnspan=2,sticky="EW",padx=(20,100))
+    Label(main_window, text='Diagnózis',).grid(row=5,column=2,columnspan=2,sticky="e",padx=(40,110))
     tk_diagnosis = Entry(main_window)
-    tk_diagnosis.grid(row=5,column=3,columnspan=2, sticky="EW", padx=(20,80))
+    tk_diagnosis.grid(row=5,column=3,columnspan=2, sticky="EW", padx=(70,20))
 
-    Button(main_window, text='Mentés', width=15, command=lambda: SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis)).grid(row=19,columnspan=5,pady=10)
+    Button(main_window, text='Mentés', width=15, command=lambda: SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis)).grid(row=19,columnspan=5,pady=(25,1))
 
     # ----------------------------- Workitem list --------------------------------
-    sep = ttk.Separator(main_window, orient="horizontal").grid(row=21, columnspan=999,pady=15,padx=20,sticky="ew")
+    sep = ttk.Separator(main_window, orient="horizontal").grid(row=20, columnspan=999,pady=15,padx=20,sticky="ew")
+    Label(main_window,text="Felvett rendelések", font=('Arial',16,'bold')).grid(row=21,column=0,columnspan=5)
     Label(main_window,text="Név").grid(row=22,column=0)
     Label(main_window,text="Lakhely").grid(row=22,column=1)
     Label(main_window,text="Telefonszám").grid(row=22,column=2)
