@@ -10,7 +10,7 @@ import subprocess
 import DB
 import Table
 import time
-
+import webbrowser
 print("hehe haha")
 
 # Global variables ˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇˇ
@@ -118,6 +118,9 @@ def PrintDocument(userID):
 
 def OpenTemplateDoc():
     os.system('start bin/Base_document.docx')
+
+def CheckUpdates():
+    webbrowser.open("https://github.com/Spntax/DocuMaker/releases")
 
 def SaveDB():
     filename = filedialog.asksaveasfilename(initialdir = "/", title = "Select a File", filetypes = (("Sqlite DB","*.db*"), ("all files","*.*")))
@@ -246,20 +249,24 @@ def DrawMainWindow():
                 tk_listbox.insert(END,fullText)
 
     MenuBar = Menu(main_window)
-    #File tab ----------
+    # File tab ----------
     FileMenu = Menu(MenuBar, tearoff=0)
     MenuBar.add_cascade(label="File", menu = FileMenu)
     FileMenu.add_command(label="Minta Dokumentum Szerkesztése", command=OpenTemplateDoc)
     FileMenu
     FileMenu
     FileMenu.add_command(label="Dokumentum sorszám", command=SetDocID)
-    #Info tab--------------
-    InfoMenu = Menu(MenuBar, tearoff=0)
-    MenuBar.add_cascade(label="Adatbázis", menu = InfoMenu)
-    InfoMenu.add_command(label="Adatbázis Mentése", command=SaveDB)
-    InfoMenu.add_command(label="Adatbázis Betöltése", command=ImportDB)
-    InfoMenu.add_separator()
-    InfoMenu.add_command(label="Adatbázis Törlése", command=DeleteDB)
+    # Database tab--------------
+    DBMenu = Menu(MenuBar, tearoff=0)
+    MenuBar.add_cascade(label="Adatbázis", menu = DBMenu)
+    DBMenu.add_command(label="Adatbázis Mentése", command=SaveDB)
+    DBMenu.add_command(label="Adatbázis Betöltése", command=ImportDB)
+    DBMenu.add_separator()
+    DBMenu.add_command(label="Adatbázis Törlése", command=DeleteDB)
+    # Update tab--------------
+    UpdateMenu = Menu(MenuBar, tearoff=0)
+    MenuBar.add_cascade(label="Frissítés", menu = UpdateMenu)
+    UpdateMenu.add_command(label="Verzíok megnyitása", command=CheckUpdates)
     Label(main_window, text='Megrendelő Neve:').grid(row=0, column=0,sticky="e")
     tk_name = Entry(main_window)
     tk_name.grid(row=0, column=1, columnspan=2, sticky="EW", padx=(20,80))
@@ -310,7 +317,7 @@ def DrawMainWindow():
 
     CreateWorkItemTable(main_window,list_data)
 
-    main_window.title("DocuMaker")
+    main_window.title("DocuMaker 1.0")
     main_window.eval('tk::PlaceWindow . center')
     icon = PhotoImage(file="bin/icon.png")
     main_window.iconphoto(icon,icon)
