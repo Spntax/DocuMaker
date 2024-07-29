@@ -23,7 +23,7 @@ class UsersDB:
             results = self.cur.execute("SELECT name,address FROM Users where name='"+nameToSearch+"'")
             return results.fetchall()
         else:
-            results = self.cur.execute("SELECT ID,name,Address,Pnumber,Callsign,Comment,JobState FROM Users")
+            results = self.cur.execute("SELECT ID,name,Address,Pnumber,TypeData,Comment,JobState FROM Users")
             return results.fetchall()
 #Comment, JobState
 

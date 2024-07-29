@@ -253,8 +253,6 @@ def DrawMainWindow():
     FileMenu = Menu(MenuBar, tearoff=0)
     MenuBar.add_cascade(label="File", menu = FileMenu)
     FileMenu.add_command(label="Minta Dokumentum Szerkesztése", command=OpenTemplateDoc)
-    FileMenu
-    FileMenu
     FileMenu.add_command(label="Dokumentum sorszám", command=SetDocID)
     # Database tab--------------
     DBMenu = Menu(MenuBar, tearoff=0)
