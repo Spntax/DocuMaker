@@ -3,6 +3,10 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 from docx import Document
+from msoffice2pdf import convert
+import msoffice2pdf
+import comtypes.client
+import docx
 import shutil
 import DocData
 import os
@@ -18,6 +22,7 @@ main_window = Tk()
 
 template_path = "bin/Base_document.docx"
 output_path = 'bin/Output_fun.docx'
+outputPdf_path = "bin/Output.pdf"
 
 doc = Document(template_path)
 
@@ -27,6 +32,7 @@ list_data = usersDB.GetWorkTable("")
 windowUpdate = False
 windowIsAlive = True
 currentUserID = 0
+tk_name,tk_address,tk_phone,tk_callsign,tk_type,tk_modell = 0,0,0,0,0,0
 
 # Global variables ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 def WindowKill():
@@ -36,27 +42,7 @@ def WindowKill():
 
 def SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis):
     global windowUpdate
-    doc = Document(template_path)
-# Update the Docuemnt class with the data filled in the main window
-    documentData.documentID = usersDB.GetDocumentID(True)
-    documentData.name = tk_name.get()
-    documentData.address = tk_address.get()
-    documentData.p_number = tk_phone.get()
-    documentData.notes = tk_note.get()
-    documentData.callsign = tk_callsign.get()
-    documentData.type_data = tk_type.get()
-    documentData.modell = tk_modell.get()
-    documentData.description = tk_description.get()
-    documentData.addons = tk_addon.get()
-    documentData.diagnosis = tk_diagnosis.get()
-
-# Update the template Docx file and replace the data
-    documentData.UpdateData(doc)
-    print(tk_name.get())
-    print(documentData.name)
-    doc.save(output_path)
-
-#Add Record to Database
+#    Add Record to Database
     usersDB.InsertRecord(tk_name.get(),tk_address.get(),tk_phone.get(),tk_note.get(),tk_callsign.get(),tk_type.get(),tk_modell.get(),tk_description.get(),tk_addon.get(),tk_diagnosis.get())
 #    bbb = Entry(main_window,width=20)
 #    bbb.grid(row=main_window.grid_size()[1])
@@ -64,6 +50,58 @@ def SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_mode
 
     windowUpdate = True
     print(windowUpdate)
+    
+def SearchCustomers():
+    def LoadButtonClicked(selectedRecord_):
+        global tk_name,tk_address,tk_phone,tk_callsign,tk_type,tk_modell
+
+        beginning=selectedRecord_.index("#")
+        userID=selectedRecord_[beginning+1:]
+        record = usersDB.GetByUserID(userID)
+        print(userID)
+
+        tk_name.delete(0,END)
+        tk_address.delete(0,END)
+        tk_phone.delete(0,END)
+        tk_callsign.delete(0,END)
+        tk_type.delete(0,END)
+        tk_modell.delete(0,END)
+
+        tk_name.insert(END,str(record[1]))
+        tk_address.insert(END,str(record[2]))
+        tk_phone.insert(END,str(record[3]))
+        tk_callsign.insert(END,str(record[4]))
+        tk_type.insert(END,str(record[8]))
+        tk_modell.insert(END,str(record[9]))
+    def SearchButtonClicked(searchInput_,listbox_):
+        listbox_.delete(0,END)
+        if searchInput_.isnumeric():
+            # Doc ID was searched
+            records = usersDB.SearchByDocID(searchInput_)
+            for record in records:
+                fullText = "Sorszám:"+str(record[13])+", "+str(record[1])+", "+str(record[2])+", "+str(record[3])+", "+str(record[4])+", "+str(record[8])+", "+str(record[9])+",                             #"+str(record[0])
+                listbox_.insert(END,fullText)       
+        else:
+            # Name was searched
+            records = usersDB.SearchByName(searchInput_)
+            for record in records:
+                fullText = "Sorszám:"+str(record[13])+", "+str(record[1])+", "+str(record[2])+", "+str(record[3])+", "+str(record[4])+", "+str(record[8])+", "+str(record[9])+",                             #"+str(record[0])
+                listbox_.insert(END,fullText)
+    customerSearchWindow = Tk()
+    customerSearchWindow.eval('tk::PlaceWindow . center')
+    customerSearchWindow.title("Keresés")
+    bottomframe = Frame(customerSearchWindow)
+    bottomframe.pack( side = BOTTOM )
+    bottomerframe = Frame(bottomframe)
+    bottomerframe.pack( side = BOTTOM )
+    Label(customerSearchWindow, text='Név/Sorszám', anchor='w').pack(fill='both',padx=10,pady=(10,0))
+    tk_entry = Entry(customerSearchWindow,width=75)
+    tk_entry.pack(padx=(10,10), pady=(0,10), side=LEFT)
+    tk_searchButton = Button(customerSearchWindow, text="Keresés", command=lambda:(SearchButtonClicked(tk_entry.get(),tk_listbox)))
+    tk_searchButton.pack(padx=(0,10),pady=(0,10), side=LEFT)
+    tk_listbox = Listbox(bottomframe,width=150,height=15)
+    tk_listbox.pack(padx=10,pady=(20,0))
+    tk_loadButton = Button(bottomerframe,text="Betöltés", command=lambda:(LoadButtonClicked(tk_listbox.get(ACTIVE))), width=15).pack(padx=(800,10),pady=(10,20))
     
 # Menu Functions here -------------------------------------
 def UpdateState(ID_,newState_):
@@ -109,12 +147,26 @@ def PrintDocument(userID):
     doc = Document(template_path)    
     recordToExport = usersDB.GetByUserID(userID)
     documentID = usersDB.GetDocumentID(True)
+    usersDB.UpdateRecordDocID(userID,documentID)
     documentData.ExtractDataFromDB(recordToExport,documentID)
 
 # Update the template Docx file and replace the data
     documentData.UpdateData(doc)
     doc.save(output_path)
-    os.system('start bin/Output_fun.docx')
+    #shutil.copyfile(output_path, "bin/Output.docx")
+    sourcepath = filedialog.askopenfilename(title="Select a File", filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+    outputpath = filedialog.askdirectory(title="Select a Folder")
+    print(sourcepath)
+    print(outputpath)
+    result = convert(source=sourcepath, output_dir=outputpath, soft="1")
+    print(result)
+
+    #pdf_format = 17
+    #word = comtypes.client.CreateObject("Word.Application")
+    #in_file = word.Documents.Open(output_path)
+    #in_file.SaveAs(os.path.abspath(outputPdf_path),FileFormat=pdf_format)
+    #in_file.Close()
+    #os.system('start bin/Output.Pdf')
 
 def OpenTemplateDoc():
     os.system('start bin/Base_document.docx')
@@ -205,6 +257,7 @@ def CreateWorkItemTable(root,list_data):
                         e.bind("<Button-3>",lambda event, user_id=list_data[i][0]: do_popup(event, user_id))
 
 def DrawMainWindow():
+    global tk_name,tk_address,tk_phone,tk_callsign,tk_type,tk_modell
     def NameSearch(e):
         position = tk_name.index(INSERT)
         print(position)
@@ -300,7 +353,8 @@ def DrawMainWindow():
     tk_diagnosis = Entry(main_window)
     tk_diagnosis.grid(row=5,column=3,columnspan=2, sticky="EW", padx=(70,20))
 
-    Button(main_window, text='Mentés', width=15, command=lambda: SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis)).grid(row=19,columnspan=5,pady=(25,1))
+    Button(main_window, text='Keresés', width=15, command=lambda: SearchCustomers()).grid(row=19,column=0,columnspan=3,pady=(25,1))
+    Button(main_window, text='Mentés', width=15, command=lambda: SaveWorkItem(tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis)).grid(row=19,column=3,columnspan=1,pady=(25,1))
 
     # ----------------------------- Workitem list --------------------------------
     sep = ttk.Separator(main_window, orient="horizontal").grid(row=20, columnspan=999,pady=15,padx=20,sticky="ew")

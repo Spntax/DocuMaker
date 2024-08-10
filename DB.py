@@ -10,10 +10,20 @@ class UsersDB:
     def SearchByName(self,nameToSearch):
         if(nameToSearch!=""):
             results = self.cur.execute("SELECT * FROM Users where name='"+nameToSearch+"'")
-            return results.fetchall()
+            returnVal = results.fetchall()
+            if returnVal==[]:
+                results = self.cur.execute("SELECT * FROM Users where name LIKE '%"+nameToSearch+"%'")
+                return results.fetchall()
+            else:
+                return returnVal
         else:
             results = self.cur.execute("SELECT * FROM Users")
             return results.fetchall()
+        
+    def SearchByDocID(self,DocID_):
+        results = self.cur.execute("SELECT * FROM Users where DocID= '"+str(DocID_)+"'")
+        return results.fetchall()
+    
     def GetByUserID(self,id_):
             results = self.cur.execute("SELECT * FROM Users where ID='"+str(id_)+"'")
             return results.fetchone()
@@ -49,9 +59,9 @@ class UsersDB:
         
     def InsertRecord(self,tk_name,tk_address,tk_phone,tk_note,tk_callsign,tk_type,tk_modell,tk_description,tk_addon,tk_diagnosis):
         self.cur.execute("""INSERT into Users
-                         (name,Address,Pnumber,Callsign,Comment,JobState,Notes,TypeData,Modell,Description,Addons,Diagnosis) 
-                         VALUES ('"""+tk_name+"""','"""+tk_address+"""','"""+tk_phone+"""','"""+tk_callsign+"""','','','"""+tk_note+"""',
-                         '"""+tk_type+"""','"""+tk_modell+"""','"""+tk_description+"""','"""+tk_addon+"""','"""+tk_diagnosis+"""');""")
+                         (name,Address,Pnumber,Callsign,Comment,JobState,Notes,TypeData,Modell,Description,Addons,Diagnosis,DocID) 
+                         VALUES ('"""+tk_name+"""','"""+tk_address+"""','"""+tk_phone+"""','"""+tk_callsign+"""','','0','"""+tk_note+"""',
+                         '"""+tk_type+"""','"""+tk_modell+"""','"""+tk_description+"""','"""+tk_addon+"""','"""+tk_diagnosis+"""','0');""")
         self.db.commit()
 
     def UpdateState(self,ID_,newState_):
@@ -67,6 +77,10 @@ class UsersDB:
     def UpdateDocID(self,newID_):
         #newState = str(newState_)
         self.cur.execute("UPDATE DocumentID SET DocuID = "+str(newID_)+" WHERE ID = 1")
+        self.db.commit()
+    def UpdateRecordDocID(self,UserID_,DocID_):
+        #newState = str(newState_)
+        self.cur.execute("UPDATE Users SET DocID = "+str(DocID_)+" WHERE ID = "+str(UserID_)+"")
         self.db.commit()
 
 #thing = UsersDB()
