@@ -387,7 +387,7 @@ def DrawMainWindow():
 
     CreateWorkItemTable(main_window,list_data)
 
-    main_window.title("DocuMaker 1.0")
+    main_window.title("DocuMaker 1.1")
     main_window.eval('tk::PlaceWindow . center')
     icon = PhotoImage(file="bin/icon.png")
     main_window.iconphoto(icon,icon)
