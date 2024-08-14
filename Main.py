@@ -154,7 +154,9 @@ def PrintDocument(userID):
     documentData.UpdateData(doc)
     doc.save(output_path)
     #shutil.copyfile(output_path, "bin/Output.docx")
-    result = convert(source="D:/Projects/DocuMaker/bin/Output_fun.docx", output_dir="D:/Projects/DocuMaker/bin", soft=1)
+    sourcePath = os.path.abspath("bin/Output_fun.docx")
+    outputPath = os.path.abspath("bin/")
+    result = convert(source=sourcePath, output_dir=outputPath, soft=1)
     print(result)
 
     #pdf_format = 17
