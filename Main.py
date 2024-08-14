@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 from docx import Document
-from msoffice2pdf import convert
+from pdfconvert import convert
 import msoffice2pdf
 import comtypes.client
 import docx
@@ -154,11 +154,7 @@ def PrintDocument(userID):
     documentData.UpdateData(doc)
     doc.save(output_path)
     #shutil.copyfile(output_path, "bin/Output.docx")
-    sourcepath = filedialog.askopenfilename(title="Select a File", filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
-    outputpath = filedialog.askdirectory(title="Select a Folder")
-    print(sourcepath)
-    print(outputpath)
-    result = convert(source=sourcepath, output_dir=outputpath, soft="1")
+    result = convert(source="D:/Projects/DocuMaker/bin/Output_fun.docx", output_dir="D:/Projects/DocuMaker/bin", soft=1)
     print(result)
 
     #pdf_format = 17
@@ -166,7 +162,7 @@ def PrintDocument(userID):
     #in_file = word.Documents.Open(output_path)
     #in_file.SaveAs(os.path.abspath(outputPdf_path),FileFormat=pdf_format)
     #in_file.Close()
-    #os.system('start bin/Output.Pdf')
+    os.system('start bin/alt_Output_fun.Pdf')
 
 def OpenTemplateDoc():
     os.system('start bin/Base_document.docx')
@@ -260,13 +256,13 @@ def DrawMainWindow():
     global tk_name,tk_address,tk_phone,tk_callsign,tk_type,tk_modell
     def NameSearch(e):
         position = tk_name.index(INSERT)
-        print(position)
-        print(e.char)
+        #print(position)
+        #print(e.char)
         if e.char == "":
             print("yahooo")
         else:
             predictedText = usersDB.GetName(tk_name.get())
-            print(predictedText)
+            #print(predictedText)
             tk_name.insert(position,predictedText[position:])
             tk_name.selection_range(position,END)
     def NameSelectedFromList(ID_,nameSelectWindow):
@@ -282,6 +278,28 @@ def DrawMainWindow():
     def NameSelected(e):
         name = tk_name.get()
         records = usersDB.SearchByName(name.title())
+        notedRecords = []
+        filteredRecords = []
+        counter = 0
+        print("Lenght of the records:"+str(len(records)))
+        for record in records:
+            isDuplicate = False
+            print("Now checking record counter:"+str(counter))
+            for name_,address_ in notedRecords:
+                print("Noted name:"+str(name_)+", Noted address:"+str(address_)+",  Record name:"+str(record[1]+", Record address:"+str(record[2])))
+                if record[1] == name_ and record[2] == address_:
+                    print("Match was found")
+                    print("popping this record:"+str(records[counter]))
+                    isDuplicate = True
+                    break
+            if not isDuplicate:
+                print("Match was not found")
+                notedRecords.append((record[1],record[2]))
+                filteredRecords.append(records[counter])
+            counter = counter+1
+            
+        records = filteredRecords
+        print("Len of records:")
         print(len(records))
         if len(records) <= 1:
             tk_name.delete(0,END)
