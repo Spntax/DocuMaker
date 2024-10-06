@@ -3,10 +3,6 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 from docx import Document
-from pdfconvert import convert
-import msoffice2pdf
-import comtypes.client
-import docx
 import shutil
 import DocData
 import os
@@ -22,7 +18,6 @@ main_window = Tk()
 
 template_path = "bin/Base_document.docx"
 output_path = 'bin/Output_fun.docx'
-outputPdf_path = "bin/Output.pdf"
 
 doc = Document(template_path)
 
@@ -153,16 +148,7 @@ def PrintDocument(userID):
 # Update the template Docx file and replace the data
     documentData.UpdateData(doc)
     doc.save(output_path)
-    #shutil.copyfile(output_path, "bin/Output.docx")
-    result = convert(source="D:/Projects/DocuMaker/bin/Output_fun.docx", output_dir="D:/Projects/DocuMaker/bin", soft=1)
-    print(result)
-
-    #pdf_format = 17
-    #word = comtypes.client.CreateObject("Word.Application")
-    #in_file = word.Documents.Open(output_path)
-    #in_file.SaveAs(os.path.abspath(outputPdf_path),FileFormat=pdf_format)
-    #in_file.Close()
-    os.system('start bin/alt_Output_fun.Pdf')
+    os.system('start bin/Output_fun.docx')
 
 def OpenTemplateDoc():
     os.system('start bin/Base_document.docx')
@@ -387,7 +373,7 @@ def DrawMainWindow():
 
     CreateWorkItemTable(main_window,list_data)
 
-    main_window.title("DocuMaker 1.0")
+    main_window.title("DocuMaker 1.1")
     main_window.eval('tk::PlaceWindow . center')
     icon = PhotoImage(file="bin/icon.png")
     main_window.iconphoto(icon,icon)
